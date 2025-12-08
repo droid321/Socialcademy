@@ -8,13 +8,39 @@
 import Foundation
 import FirebaseFirestore
 
-struct PostsRepository {
+protocol PostsRepositoryProtocol {
+    func create(_ post: Post) async throws
+    func fetchPosts() async throws -> [Post]
+}
+
+#if DEBUG
+struct PostsRepositoryStub: PostsRepositoryProtocol {
+    let state: Loadable<[Post]>
     
-    static let postsReference = Firestore.firestore().collection("posts")
+    func fetchPosts() async throws -> [Post] {
+        return try await state.simulate()
+    }
     
-    static func create(_ post: Post) async throws {
+    func create(_ post: Post) async throws {}
+}
+#endif
+
+struct PostsRepository: PostsRepositoryProtocol {
+    
+     let postsReference = Firestore.firestore().collection("posts")
+    
+     func create(_ post: Post) async throws {
         let document = postsReference.document(post.id.uuidString)
         try await document.setData(from: post)
+    }
+    
+     func fetchPosts() async throws -> [Post] {
+        let snapshot = try await postsReference
+            .order(by: "timestamp", descending: true)
+            .getDocuments()
+        return snapshot.documents.compactMap { document in
+            try! document.data(as: Post.self)
+        }
     }
 }
 

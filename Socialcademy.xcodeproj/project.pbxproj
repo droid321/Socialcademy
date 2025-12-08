@@ -11,6 +11,7 @@
 		CA1867702EE41B2200625E63 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = CA18676F2EE41B2200625E63 /* FirebaseAnalytics */; };
 		CA1867722EE41B2200625E63 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867712EE41B2200625E63 /* FirebaseFirestore */; };
 		CA1867742EE41B2200625E63 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867732EE41B2200625E63 /* FirebaseFirestoreCombine-Community */; };
+		CA18678F2EE712C300625E63 /* EmptyListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA18678E2EE712C300625E63 /* EmptyListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		CA1867422EE4162A00625E63 /* Socialcademy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Socialcademy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA18674F2EE4162C00625E63 /* SocialcademyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialcademyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA1867592EE4162C00625E63 /* SocialcademyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialcademyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA18678E2EE712C300625E63 /* EmptyListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -86,6 +88,7 @@
 		CA1867392EE4162A00625E63 = {
 			isa = PBXGroup;
 			children = (
+				CA18678D2EE712AF00625E63 /* Supporting Views */,
 				CA1867442EE4162A00625E63 /* Socialcademy */,
 				CA1867522EE4162C00625E63 /* SocialcademyTests */,
 				CA18675C2EE4162C00625E63 /* SocialcademyUITests */,
@@ -101,6 +104,14 @@
 				CA1867592EE4162C00625E63 /* SocialcademyUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CA18678D2EE712AF00625E63 /* Supporting Views */ = {
+			isa = PBXGroup;
+			children = (
+				CA18678E2EE712C300625E63 /* EmptyListView.swift */,
+			);
+			path = "Supporting Views";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA18678F2EE712C300625E63 /* EmptyListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
