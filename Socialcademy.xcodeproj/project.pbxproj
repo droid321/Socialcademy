@@ -12,6 +12,7 @@
 		CA1867722EE41B2200625E63 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867712EE41B2200625E63 /* FirebaseFirestore */; };
 		CA1867742EE41B2200625E63 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867732EE41B2200625E63 /* FirebaseFirestoreCombine-Community */; };
 		CA18678F2EE712C300625E63 /* EmptyListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA18678E2EE712C300625E63 /* EmptyListView.swift */; };
+		CA1867912EE8648100625E63 /* ErrorAlertViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1867902EE8648100625E63 /* ErrorAlertViewModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		CA18674F2EE4162C00625E63 /* SocialcademyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialcademyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA1867592EE4162C00625E63 /* SocialcademyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SocialcademyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA18678E2EE712C300625E63 /* EmptyListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyListView.swift; sourceTree = "<group>"; };
+		CA1867902EE8648100625E63 /* ErrorAlertViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlertViewModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				CA18678E2EE712C300625E63 /* EmptyListView.swift */,
+				CA1867902EE8648100625E63 /* ErrorAlertViewModifier.swift */,
 			);
 			path = "Supporting Views";
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA1867912EE8648100625E63 /* ErrorAlertViewModifier.swift in Sources */,
 				CA18678F2EE712C300625E63 /* EmptyListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
