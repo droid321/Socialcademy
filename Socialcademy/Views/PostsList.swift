@@ -42,7 +42,7 @@ struct PostsList: View {
                     .animation(.default, value: posts)
                 }
             }
-            .navigationTitle("Posts")
+            .navigationTitle(viewModel.title)
             .toolbar {
                 Button {
                     showNewPostForm = true
@@ -89,7 +89,6 @@ struct PostsList_Previews: PreviewProvider {
     @MainActor
     private struct ListPreview: View {
         let state: Loadable<[Post]>
-        
         var body: some View {
             let postsRepository = PostsRepositoryStub(state: state)
             let viewModel = PostsViewModel(postsRepository: postsRepository)
