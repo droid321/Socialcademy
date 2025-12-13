@@ -14,10 +14,14 @@ class PostRowViewModel: ObservableObject {
     @Published var post: Post
     @Published var error: Error?
     
-    private let deleteAction: Action
+    private let deleteAction: Action?
     private let favoriteAction: Action
     
-    init(post: Post, deleteAction: @escaping Action, favoriteAction: @escaping Action) {
+    var canDeletePost: Bool {
+        deleteAction != nil
+    }
+    
+    init(post: Post, deleteAction:  Action?, favoriteAction: @escaping Action) {
         self.post = post
         self.deleteAction = deleteAction
         self.favoriteAction = favoriteAction
@@ -28,6 +32,9 @@ class PostRowViewModel: ObservableObject {
     }
     
     func deletePost() {
+        guard let deleteAction = deleteAction else {
+            preconditionFailure("Cannot delete post: no delete action provided")
+        }
         withErrorHandlingTask(perform: deleteAction)
     }
     

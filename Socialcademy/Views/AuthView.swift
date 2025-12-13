@@ -13,8 +13,10 @@ struct AuthView: View {
 
     var body: some View {
         
-        if viewModel.isAuthenticated {
+
+            if let user = viewModel.user {
                 MainTabView()
+                    .environmentObject(ViewModelFactory(user: user))
             } else {
                 NavigationView {
                     SignInForm(viewModel: viewModel.makeSignInViewModel()) {
@@ -41,6 +43,8 @@ private extension AuthView {
                     .textContentType(.name)
                 TextField("Email", text: $viewModel.email)
                     .textContentType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled(true)
                 SecureField("Password", text: $viewModel.password)
                     .textContentType(.newPassword)
             } footer: {
@@ -64,6 +68,8 @@ private extension AuthView {
             AuthForm {
                 TextField("Email", text: $viewModel.email)
                             .textContentType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
                         SecureField("Password", text: $viewModel.password)
                             .textContentType(.password)
             } footer: {
