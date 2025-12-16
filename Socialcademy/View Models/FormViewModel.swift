@@ -2,7 +2,7 @@
 //  FormViewModel.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 13/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
 
 import Foundation
@@ -11,9 +11,12 @@ import Foundation
 @dynamicMemberLookup
 class FormViewModel<Value>: ObservableObject {
     typealias Action = (Value) async throws -> Void
-    @Published var isWorking = false
+    
     @Published var value: Value
     @Published var error: Error?
+    @Published var isWorking = false
+    private let initialValue: Value
+
     
     subscript<T>(dynamicMember keyPath: WritableKeyPath<Value, T>) -> T {
         get { value[keyPath: keyPath] }
@@ -24,6 +27,7 @@ class FormViewModel<Value>: ObservableObject {
     
     init(initialValue: Value, action: @escaping Action) {
         self.value = initialValue
+        self.initialValue = initialValue
         self.action = action
     }
     
@@ -33,12 +37,28 @@ class FormViewModel<Value>: ObservableObject {
         }
     }
     
+    func reset(to newValue: Value? = nil) {
+        value = newValue ?? value // if you want to allow resetting to a new value
+    }
+    
+    /*private func handleSubmit() async {
+        isWorking = true
+        do {
+            try await action(value)
+            value = initialValue
+        } catch {
+            print("[FormViewModel] Cannot submit: \(error)")
+            self.error = error
+        }
+        isWorking = false
+    } */
+    
     private func handleSubmit() async {
         isWorking = true
         do {
             try await action(value)
+            value = initialValue  // <-- resets TextField automatically
         } catch {
-            print("[FormViewModel] Cannot submit: \(error)")
             self.error = error
         }
         isWorking = false

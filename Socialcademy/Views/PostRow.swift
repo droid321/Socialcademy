@@ -2,72 +2,65 @@
 //  PostRow.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 7/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
 
 import SwiftUI
 
+// MARK: - PostRow
 
 struct PostRow: View {
     @ObservedObject var viewModel: PostRowViewModel
+    
     @State private var showConfirmationDialog = false
-
+    
+    @EnvironmentObject private var factory: ViewModelFactory
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10){
-            HStack{
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
                 AuthorView(author: viewModel.author)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
                 Spacer()
                 Text(viewModel.timestamp.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption)
             }
             .foregroundColor(.gray)
-                Text(viewModel.title)
+            Text(viewModel.title)
                 .font(.title3)
                 .fontWeight(.semibold)
-                Text(viewModel.content)
+            Text(viewModel.content)
             HStack {
-                FavoriteButton(isFavorite: viewModel.isFavorite, action: {viewModel.favoritePost()
+                FavoriteButton(isFavorite: viewModel.isFavorite, action: {
+                    viewModel.favoritePost()
                 })
-               Spacer()
+                NavigationLink {
+                    CommentsList(viewModel: factory.makeCommentsViewModel(for: viewModel.post))
+                } label: {
+                    Label("Comments", systemImage: "text.bubble")
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
                 if viewModel.canDeletePost {
                     Button(role: .destructive, action: {
                         showConfirmationDialog = true
                     }) {
-                       Label("Delete", systemImage: "trash")
-                   }
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
-           } .labelStyle(.iconOnly)
+            }
+            .labelStyle(.iconOnly)
         }
         .padding()
-        .confirmationDialog ("Are you sure you want to delete this post?", isPresented: $showConfirmationDialog, titleVisibility: .visible) {
-            Button ("Delete", role: .destructive, action: {viewModel.deletePost()
+        .confirmationDialog("Are you sure you want to delete this post?", isPresented: $showConfirmationDialog, titleVisibility: .visible) {
+            Button("Delete", role: .destructive, action: {
+                viewModel.deletePost()
             })
         }
         .alert("Error", error: $viewModel.error)
     }
 }
 
-private extension PostRow {
-    struct FavoriteButton: View {
-        let isFavorite: Bool
-        let action: () -> Void
-        
-        var body: some View {
-            Button(action: action) {
-                if isFavorite {
-                    Label("Remove from favorites", systemImage: "heart.fill")
-                } else {
-                    Label("Add to favorites", systemImage: "heart")
-                }
-            }
-            .foregroundColor(isFavorite ? .red : .gray)
-            .animation(.default, value: isFavorite)
-        }
-    }
-}
+// MARK: - AuthorView
 
 private extension PostRow {
     struct AuthorView: View {
@@ -87,10 +80,33 @@ private extension PostRow {
     }
 }
 
+// MARK: - FavoriteButton
+
+private extension PostRow {
+    struct FavoriteButton: View {
+        let isFavorite: Bool
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                if isFavorite {
+                    Label("Remove from Favorites", systemImage: "heart.fill")
+                } else {
+                    Label("Add to Favorites", systemImage: "heart")
+                }
+            }
+            .foregroundColor(isFavorite ? .red : .gray)
+            .animation(.default, value: isFavorite)
+        }
+    }
+}
+
+// MARK: - Preview
 
 struct PostRow_Previews: PreviewProvider {
     static var previews: some View {
-            PostRow(viewModel: PostRowViewModel (post: Post.testPost, deleteAction: {}, favoriteAction: {}))
-                .previewLayout(.sizeThatFits)
+        PostRow(viewModel: PostRowViewModel(post: Post.testPost, deleteAction: {}, favoriteAction: {}))
+            .environmentObject(ViewModelFactory.preview)
+            .previewLayout(.sizeThatFits)
     }
 }

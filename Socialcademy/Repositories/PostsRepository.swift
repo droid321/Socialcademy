@@ -9,14 +9,14 @@ import Foundation
 import FirebaseFirestore
 
 protocol PostsRepositoryProtocol {
-    func create(_ post: Post) async throws
+    var user: User { get }
     func fetchAllPosts() async throws -> [Post]
+    func fetchPosts(by author: User) async throws -> [Post]
+    func fetchFavoritePosts() async throws -> [Post]
+    func create(_ post: Post) async throws
     func delete(_ post: Post) async throws
     func favorite(_ post: Post) async throws
     func unfavorite(_ post: Post) async throws
-    func fetchFavoritePosts() async throws -> [Post]
-    func fetchPosts(by author: User) async throws -> [Post]
-    var user: User { get }
 }
 
 extension PostsRepositoryProtocol {
@@ -25,11 +25,18 @@ extension PostsRepositoryProtocol {
     }
 }
 
+// MARK: - PostsRepositoryStub
+
 #if DEBUG
 struct PostsRepositoryStub: PostsRepositoryProtocol {
     let state: Loadable<[Post]>
-    var user = User.testUser
+    let user = User.testUser
+    
     func fetchAllPosts() async throws -> [Post] {
+        return try await state.simulate()
+    }
+    
+    func fetchPosts(by author: User) async throws -> [Post] {
         return try await state.simulate()
     }
     
@@ -37,47 +44,29 @@ struct PostsRepositoryStub: PostsRepositoryProtocol {
         return try await state.simulate()
     }
     
-    func delete(_ post: Post) async throws {
-    }
-    
-    func favorite(_ post: Post) async throws {
-    }
-    
-    func fetchPosts(by author: User) async throws -> [Post] {
-        return try await state.simulate()
-    }
-    
-    func unfavorite(_ post: Post) async throws {
-    }
-    
     func create(_ post: Post) async throws {}
+    
+    func delete(_ post: Post) async throws {}
+    
+    func favorite(_ post: Post) async throws {}
+    
+    func unfavorite(_ post: Post) async throws {}
 }
 #endif
 
+// MARK: - PostsRepository
+
 struct PostsRepository: PostsRepositoryProtocol {
-    
-    let postsReference = Firestore.firestore().collection("posts_v2")
     let user: User
+    let postsReference = Firestore.firestore().collection("posts_v2")
     let favoritesReference = Firestore.firestore().collection("favorites")
     
-     func create(_ post: Post) async throws {
-        let document = postsReference.document(post.id.uuidString)
-        try await document.setData(from: post)
-    }
-    
-    func delete(_ post: Post) async throws {
-        precondition(canDelete(post))
-        let document = postsReference.document(post.id.uuidString)
-        try await document.delete()
+    func fetchAllPosts() async throws -> [Post] {
+        return try await fetchPosts(from: postsReference)
     }
     
     func fetchPosts(by author: User) async throws -> [Post] {
         return try await fetchPosts(from: postsReference.whereField("author.id", isEqualTo: author.id))
-    }
-
-    
-     func fetchAllPosts() async throws -> [Post] {
-         return try await fetchPosts(from: postsReference)
     }
     
     func fetchFavoritePosts() async throws -> [Post] {
@@ -91,56 +80,32 @@ struct PostsRepository: PostsRepositoryProtocol {
                 post.setting(\.isFavorite, to: true)
             }
     }
-
-        
+    
+    func create(_ post: Post) async throws {
+        let document = postsReference.document(post.id.uuidString)
+        try await document.setData(from: post)
+    }
+    
+    func delete(_ post: Post) async throws {
+        precondition(canDelete(post))
+        let document = postsReference.document(post.id.uuidString)
+        try await document.delete()
+    }
+    
     func favorite(_ post: Post) async throws {
         let favorite = Favorite(postID: post.id, userID: user.id)
-        try await favoritesReference
-            .document(favorite.id)
-            .setData(from: favorite)
+        let document = favoritesReference.document(favorite.id)
+        try await document.setData(from: favorite)
     }
-
     
     func unfavorite(_ post: Post) async throws {
-        let favoriteID = post.id.uuidString + "-" + user.id
-        try await favoritesReference
-            .document(favoriteID)
-            .delete()
-    }
-
-}
-
-private extension DocumentReference {
-    func setData<T: Encodable>(from value: T) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            try! setData(from: value) { error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                continuation.resume()
-            }
-        }
+        let favorite = Favorite(postID: post.id, userID: user.id)
+        let document = favoritesReference.document(favorite.id)
+        try await document.delete()
     }
 }
 
 private extension PostsRepository {
-    struct Favorite: Identifiable, Codable {
-        var id: String {
-            postID.uuidString + "-" + userID
-        }
-        
-        let postID: Post.ID
-        let userID: User.ID
-    }
-    
-    func fetchFavorites() async throws -> [Post.ID] {
-        return try await favoritesReference
-            .whereField("userID", isEqualTo: user.id)
-            .getDocuments(as: Favorite.self)
-            .map(\.postID)
-    }
-    
     func fetchPosts(from query: Query) async throws -> [Post] {
         let (posts, favorites) = try await (
             query.order(by: "timestamp", descending: true).getDocuments(as: Post.self),
@@ -151,6 +116,20 @@ private extension PostsRepository {
         }
     }
     
+    func fetchFavorites() async throws -> [Post.ID] {
+        return try await favoritesReference
+            .whereField("userID", isEqualTo: user.id)
+            .getDocuments(as: Favorite.self)
+            .map(\.postID)
+    }
+    
+    struct Favorite: Identifiable, Codable {
+        var id: String {
+            postID.uuidString + "-" + userID
+        }
+        let postID: Post.ID
+        let userID: User.ID
+    }
 }
 
 private extension Post {
@@ -161,11 +140,3 @@ private extension Post {
     }
 }
 
-private extension Query {
-    func getDocuments<T: Decodable>(as type: T.Type) async throws -> [T] {
-        let snapshot = try await getDocuments()
-        return snapshot.documents.compactMap { document in
-            try! document.data(as: type)
-        }
-    }
-}

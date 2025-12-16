@@ -2,33 +2,31 @@
 //  PostRowViewModel.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 11/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
-
 import Foundation
+
 @MainActor
 @dynamicMemberLookup
-class PostRowViewModel: ObservableObject {
+class PostRowViewModel: ObservableObject, ErrorHandler {
     typealias Action = () async throws -> Void
     
     @Published var post: Post
     @Published var error: Error?
     
-    private let deleteAction: Action?
-    private let favoriteAction: Action
-    
-    var canDeletePost: Bool {
-        deleteAction != nil
-    }
-    
-    init(post: Post, deleteAction:  Action?, favoriteAction: @escaping Action) {
-        self.post = post
-        self.deleteAction = deleteAction
-        self.favoriteAction = favoriteAction
-    }
+    var canDeletePost: Bool { deleteAction != nil }
     
     subscript<T>(dynamicMember keyPath: KeyPath<Post, T>) -> T {
         post[keyPath: keyPath]
+    }
+    
+    private let deleteAction: Action?
+    private let favoriteAction: Action
+    
+    init(post: Post, deleteAction: Action?, favoriteAction: @escaping Action) {
+        self.post = post
+        self.deleteAction = deleteAction
+        self.favoriteAction = favoriteAction
     }
     
     func deletePost() {
@@ -38,19 +36,7 @@ class PostRowViewModel: ObservableObject {
         withErrorHandlingTask(perform: deleteAction)
     }
     
-    
     func favoritePost() {
         withErrorHandlingTask(perform: favoriteAction)
-    }
-    
-    private func withErrorHandlingTask(perform action: @escaping Action) {
-        Task {
-            do {
-                try await action()
-            } catch {
-                print("[PostRowViewModel] Error occurred: \(error)")
-                self.error = error
-            }
-        }
     }
 }

@@ -2,27 +2,27 @@
 //  NewPostForm.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 7/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
 
 import SwiftUI
 
 struct NewPostForm: View {
     @StateObject var viewModel: FormViewModel<Post>
-    @Environment(\.dismiss) private var dismiss
     
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationView {
-            Form{
+            Form {
                 Section {
                     TextField("Title", text: $viewModel.title)
                 }
-                Section("Content"){
+                Section("Content") {
                     TextEditor(text: $viewModel.content)
                         .multilineTextAlignment(.leading)
                 }
-                Button(action: viewModel.submit){
+                Button(action: viewModel.submit) {
                     if viewModel.isWorking {
                         ProgressView()
                     } else {
@@ -38,10 +38,10 @@ struct NewPostForm: View {
             .onSubmit(viewModel.submit)
             .navigationTitle("New Post")
         }
-        .disabled(viewModel.isWorking)
         .alert("Cannot Create Post", error: $viewModel.error)
+        .disabled(viewModel.isWorking)
         .onChange(of: viewModel.isWorking) { isWorking in
-            guard !isWorking, viewModel.error == nil else {return}
+            guard !isWorking else { return }
             dismiss()
         }
     }
@@ -49,6 +49,6 @@ struct NewPostForm: View {
 
 struct NewPostForm_Previews: PreviewProvider {
     static var previews: some View {
-        NewPostForm(viewModel: FormViewModel(initialValue: Post.testPost, action: { _ in }))
+        NewPostForm(viewModel: FormViewModel<Post>(initialValue: Post.testPost, action: { _ in }))
     }
 }

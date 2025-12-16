@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 13/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
 
 import SwiftUI
@@ -16,6 +16,8 @@ struct ProfileView: View {
     }
 }
 
-#Preview {
-    ProfileView()
+struct ProfileView_Previews: PreviewProvider {
+    static var previews: some View {
+        ProfileView()
+    }
 }

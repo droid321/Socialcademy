@@ -1,76 +1,73 @@
 //
-//  PostList.swift
+//  PostsList.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 7/12/2025.
+//  Created by Carl SanAgustin on 9/12/2025.
 //
 
 import SwiftUI
 
 struct PostsList: View {
     @StateObject var viewModel: PostsViewModel
+    
     @State private var searchText = ""
     @State private var showNewPostForm = false
     
-    
     var body: some View {
-            Group {
-                switch viewModel.posts {
-                case .loading:
-                    ProgressView()
-                case let .error(error):
-                    EmptyListView(
-                        title: "Cannot Load Posts",
-                        message: error.localizedDescription,
-                        retryAction: {
-                            viewModel.fetchPosts()
-                        }
-                    )
-                case .empty:
-                    EmptyListView(
-                        title: "No Posts",
-                        message: "There aren’t any posts yet."
-                    )
-                case let .loaded(posts):
-                    ScrollView {
-                        ForEach(posts) { post in
-                            if searchText.isEmpty || post.contains(searchText) {
-                                PostRow(viewModel: viewModel.makePostRowViewModel(for: post))
-                            }
-                        }
-                        .searchable(text: $searchText)
-                        .animation(.default, value: posts)
+        Group {
+            switch viewModel.posts {
+            case .loading:
+                ProgressView()
+            case let .error(error):
+                EmptyListView(
+                    title: "Cannot Load Posts",
+                    message: error.localizedDescription,
+                    retryAction: {
+                        viewModel.fetchPosts()
                     }
+                )
+            case .empty:
+                EmptyListView(
+                    title: "No Posts",
+                    message: "There aren’t any posts yet."
+                )
+            case let .loaded(posts):
+                ScrollView {
+                    ForEach(posts) { post in
+                        if searchText.isEmpty || post.contains(searchText) {
+                            PostRow(viewModel: viewModel.makePostRowViewModel(for: post))
+                        }
+                    }
+                    .searchable(text: $searchText)
+                    .animation(.default, value: posts)
                 }
             }
-            .navigationTitle(viewModel.title)
-            .toolbar {
-                Button {
-                    showNewPostForm = true
-                } label: {
-                    Label("New Post", systemImage: "square.and.pencil")
-                }
         }
+        .navigationTitle(viewModel.title)
         .onAppear {
             viewModel.fetchPosts()
         }
         .sheet(isPresented: $showNewPostForm) {
-            NewPostForm(viewModel: viewModel.makeNewPostsViewModel())
+            NewPostForm(viewModel: viewModel.makeNewPostViewModel())
+        }
+        .toolbar {
+            Button {
+                showNewPostForm = true
+            } label: {
+                Label("New Post", systemImage: "square.and.pencil")
+            }
         }
     }
 }
 
-extension Loadable: Equatable where Value: Equatable {
-    static func == (lhs: Loadable<Value>, rhs: Loadable<Value>) -> Bool {
-        switch (lhs, rhs) {
-        case (.loading, .loading):
-            return true
-        case let (.error(error1), .error(error2)):
-            return error1.localizedDescription == error2.localizedDescription
-        case let (.loaded(value1), .loaded(value2)):
-            return value1 == value2
-        default:
-            return false
+extension PostsList {
+    struct RootView: View {
+        @StateObject var viewModel: PostsViewModel
+        
+        var body: some View {
+            NavigationView {
+                PostsList(viewModel: viewModel)
+            }
         }
     }
 }
@@ -83,14 +80,17 @@ struct PostsList_Previews: PreviewProvider {
         ListPreview(state: .error)
         ListPreview(state: .loading)
     }
+    
     @MainActor
     private struct ListPreview: View {
         let state: Loadable<[Post]>
+        
         var body: some View {
             let postsRepository = PostsRepositoryStub(state: state)
             let viewModel = PostsViewModel(postsRepository: postsRepository)
             NavigationView {
                 PostsList(viewModel: viewModel)
+                    .environmentObject(ViewModelFactory.preview)
             }
         }
     }

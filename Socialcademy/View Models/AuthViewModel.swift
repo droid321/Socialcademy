@@ -2,11 +2,10 @@
 //  AuthViewModel.swift
 //  Socialcademy
 //
-//  Created by Carl SanAgustin on 13/12/2025.
+// Created by Carl SanAgustin on 9/12/2025.
 //
 
 import Foundation
-
 
 @MainActor
 class AuthViewModel: ObservableObject {
@@ -17,12 +16,11 @@ class AuthViewModel: ObservableObject {
     init() {
         authService.$user.assign(to: &$user)
     }
-
     
     func makeSignInViewModel() -> SignInViewModel {
         return SignInViewModel(action: authService.signIn(email:password:))
     }
-
+    
     func makeCreateAccountViewModel() -> CreateAccountViewModel {
         return CreateAccountViewModel(action: authService.createAccount(name:email:password:))
     }
@@ -41,4 +39,3 @@ extension AuthViewModel {
         }
     }
 }
-
