@@ -11,8 +11,8 @@ import SwiftUI
 
 struct CommentsList: View {
     @StateObject var viewModel: CommentsViewModel
-    @StateObject private var newCommentViewModel: FormViewModel<Comment> // try fix comment text field
-    
+    @StateObject private var newCommentViewModel: FormViewModel<Comment>
+
     init(viewModel: CommentsViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self._newCommentViewModel = StateObject(
@@ -21,42 +21,55 @@ struct CommentsList: View {
     }
 
     var body: some View {
-        Group {
-            switch viewModel.comments {
-            case .loading:
-                ProgressView()
-                    .onAppear {
-                        viewModel.fetchComments()
+        VStack(spacing: 0) {
+            Group {
+                switch viewModel.comments {
+                case .loading:
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onAppear { viewModel.fetchComments() }
+                case let .error(error):
+                    EmptyListView(
+                        title: "Cannot Load Comments",
+                        message: error.localizedDescription,
+                        retryAction: { viewModel.fetchComments() }
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                case .empty:
+                    Spacer() // Pushes the form to the bottom
+                case let .loaded(comments):
+                    List(comments) { comment in
+                        CommentRow(
+                            comment: comment,
+                            onDeleteRequest: {
+                                viewModel.commentPendingDeletion = comment
+                            }
+                        )
                     }
-            case let .error(error):
-                EmptyListView(
-                    title: "Cannot Load Comments",
-                    message: error.localizedDescription,
-                    retryAction: {
-                        viewModel.fetchComments()
+                    .confirmationDialog(
+                        "Are you sure you want to delete this comment?",
+                        isPresented: .constant(viewModel.commentPendingDeletion != nil),
+                        titleVisibility: .visible
+                    ) {
+                        Button("Delete", role: .destructive) {
+                            Task { await viewModel.confirmDelete() }
+                        }
+                        Button("Cancel", role: .cancel) {
+                            viewModel.commentPendingDeletion = nil
+                        }
                     }
-                )
-            case .empty:
-                EmptyListView(
-                    title: "No Comments",
-                    message: "Be the first to leave a comment."
-                )
-            case let .loaded(comments):
-                List(comments) { comment in
-                    CommentRow(viewModel: viewModel.makeCommentRowViewModel(for: comment))
+                    .animation(.default, value: comments)
                 }
-                .animation(.default, value: comments)
             }
-        }
-        .navigationTitle("Comments")
-        .navigationBarTitleDisplayMode(.inline)
-        .safeAreaInset(edge: .bottom) {
+
             NewCommentForm(viewModel: newCommentViewModel)
                 .padding(.vertical, 8)
                 .padding(.horizontal)
                 .background(Color(UIColor.systemBackground).shadow(radius: 1))
         }
-
+        .onAppear { viewModel.fetchComments() }
+        .navigationTitle("Comments")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -69,6 +82,7 @@ private extension CommentsList {
         var body: some View {
             HStack {
                 TextField("Comment", text: $viewModel.value.content)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
                 Button(action: viewModel.submit) {
                     if viewModel.isWorking {
                         ProgressView()

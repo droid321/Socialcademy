@@ -10,6 +10,8 @@ import Foundation
 @MainActor
 class CommentsViewModel: ObservableObject {
     @Published var comments: Loadable<[Comment]> = .loading
+    @Published var commentPendingDeletion: Comment?
+
     
     private let commentsRepository: CommentsRepositoryProtocol
     
@@ -17,12 +19,60 @@ class CommentsViewModel: ObservableObject {
         self.commentsRepository = commentsRepository
     }
     
-    func fetchComments() {
+    @Published var rowViewModels: [UUID: CommentRowViewModel] = [:] // test delete fix
+
+    func updateRowViewModels() {
+        guard case let .loaded(commentsArray) = comments else { return }
+        rowViewModels = Dictionary(uniqueKeysWithValues: commentsArray.map {
+            ($0.id, makeCommentRowViewModel(for: $0))
+        })
+    } // test delete fix
+    
+    /*func fetchComments() {
         Task {
             do {
                 comments = .loaded(try await commentsRepository.fetchComments())
             } catch {
                 print("[CommentsViewModel] Cannot fetch comments: \(error)")
+                comments = .error(error)
+            }
+        }
+    } */
+    
+   /* func confirmDelete() async {
+        guard let comment = commentPendingDeletion else { return }
+        commentPendingDeletion = nil
+
+        try await commentsRepository.delete(comment)
+
+        if case var .loaded(current) = comments {
+            current.removeAll { $0.id == comment.id }
+            comments = .loaded(current)
+        }
+    } */
+    
+    func confirmDelete() async {
+        guard let comment = commentPendingDeletion else { return }
+        commentPendingDeletion = nil
+
+        do {
+            try await commentsRepository.delete(comment)
+
+            if case var .loaded(current) = comments {
+                current.removeAll { $0.id == comment.id }
+                comments = .loaded(current)
+            }
+        } catch {
+            print("[CommentsViewModel] Cannot delete comment: \(error)")
+        }
+    }
+    
+    func fetchComments() {
+        Task {
+            do {
+                comments = .loaded(try await commentsRepository.fetchComments())
+                updateRowViewModels() // <-- keep persistent view models
+            } catch {
                 comments = .error(error)
             }
         }

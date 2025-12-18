@@ -28,10 +28,15 @@ class CommentRowViewModel: ObservableObject, ErrorHandler {
         self.deleteAction = deleteAction
     }
     
-    func deleteComment() {
+    /*func deleteComment() {
         guard let deleteAction = deleteAction else {
             preconditionFailure("Cannot delete comment: no delete action provided")
         }
         withErrorHandlingTask(perform: deleteAction)
+    } */
+    
+    func deleteComment() async {
+        guard let deleteAction = deleteAction else { return }
+        await withErrorHandlingTask(perform: deleteAction)
     }
 }
