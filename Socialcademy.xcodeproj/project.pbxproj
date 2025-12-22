@@ -12,6 +12,7 @@
 		CA1867722EE41B2200625E63 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867712EE41B2200625E63 /* FirebaseFirestore */; };
 		CA1867742EE41B2200625E63 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867732EE41B2200625E63 /* FirebaseFirestoreCombine-Community */; };
 		CA1867982EEC37C400625E63 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = CA1867972EEC37C400625E63 /* FirebaseAuth */; };
+		CAEB65872EF9727700727074 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = CAEB65862EF9727700727074 /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 				CA1867742EE41B2200625E63 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				CA18676E2EE41B2200625E63 /* FirebaseAI in Frameworks */,
 				CA1867722EE41B2200625E63 /* FirebaseFirestore in Frameworks */,
+				CAEB65872EF9727700727074 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +140,7 @@
 				CA1867712EE41B2200625E63 /* FirebaseFirestore */,
 				CA1867732EE41B2200625E63 /* FirebaseFirestoreCombine-Community */,
 				CA1867972EEC37C400625E63 /* FirebaseAuth */,
+				CAEB65862EF9727700727074 /* FirebaseStorage */,
 			);
 			productName = Socialcademy;
 			productReference = CA1867422EE4162A00625E63 /* Socialcademy.app */;
@@ -427,6 +430,9 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NSCameraUsageDescription;
+				INFOPLIST_KEY_LSApplicationCategoryType = NSCameraUsageDescription;
+				INFOPLIST_KEY_NSCameraUsageDescription = NSCameraUsageDescription;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -456,6 +462,9 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NSCameraUsageDescription;
+				INFOPLIST_KEY_LSApplicationCategoryType = NSCameraUsageDescription;
+				INFOPLIST_KEY_NSCameraUsageDescription = NSCameraUsageDescription;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -620,6 +629,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CA18676C2EE41B2200625E63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		CAEB65862EF9727700727074 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA18676C2EE41B2200625E63 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
