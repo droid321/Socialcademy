@@ -21,6 +21,13 @@ class AuthViewModel: ObservableObject {
         return SignInViewModel(action: authService.signIn(email:password:))
     }
     
+    func makeViewModelFactory() -> ViewModelFactory? {
+        guard let user = user else {
+            return nil
+        }
+        return ViewModelFactory(user: user, authService: authService)
+    }
+    
     func makeCreateAccountViewModel() -> CreateAccountViewModel {
         return CreateAccountViewModel(action: authService.createAccount(name:email:password:))
     }
